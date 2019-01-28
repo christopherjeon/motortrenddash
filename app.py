@@ -12,47 +12,20 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 
 models = []
-mpgvalues =[]
-cylvalues = []
-dispvalues = []
-stats = ['mpg', 'cyl', 'disp' ]
+stats = ['mpg', 'cyl', 'disp', 'hp', 'drat']
 
 for i in range(0, 10):
     models.append(data['model'][i])
-
-for i in range(0, 10):
-    mpgvalues.append(data.iloc[i][1])
-  
-
-for i in range(0, 10):
-    cylvalues.append(data.iloc[i][2])
-    
-
-for i in range(0, 10):
-    dispvalues.append(data.iloc[i][3])
-
-mpg_dict = dict(zip(models, mpgvalues))
-cyl_dict = dict(zip(models, cylvalues))
-disp_dict = dict(zip(models, dispvalues))
-
 
 
 app.layout = html.Div([
     html.Div([
         dcc.Dropdown(
             id="model-column",
-            options=[{'label': i, 'value': i} for i in models],
-            value='Mazda RX4'
+            options=[{'label': i, 'value': i} for i in stats],
+            value='mpg'
         ),
-        dcc.Dropdown(
-            id='stat-column',
-            options=[
-                {'label': 'MPG', 'value': stats[0]},
-                {'label': 'CYL', 'value': stats[1]},
-                {'label': 'DISP', 'value': stats[2]}
-            ],
-            value='MPG'
-        ),
+        
         dcc.Graph(id='model-graphic')
     ])
 ])
@@ -60,15 +33,35 @@ app.layout = html.Div([
 
 @app.callback(
     dash.dependencies.Output('model-graphic', 'figure'),
-    [dash.dependencies.Input('stat-column', 'value'),
-     dash.dependencies.Input('model-column', 'value')]
+    [dash.dependencies.Input('model-column', 'value')]
+     
 )
 def update_model(model_column):
-
+    
     return {
         'data': [go.Scatter(
-            
-        )]
+            x= models,
+            y= data[model_column],
+            mode='markers',
+            marker={
+                'size': 15,
+                'opacity': 0.5,
+                'line': {'width': 0.5, 'color': 'white'}
+            }
+        )],
+
+        'layout': go.Layout(
+            xaxis={
+                'title': model_column
+                
+            },
+            yaxis={
+                'title': 'stat'
+                
+            },
+            margin={'l': 40, 'b': 40, 't': 10, 'r': 0},
+            hovermode='closest'
+        )
 
 
     }
